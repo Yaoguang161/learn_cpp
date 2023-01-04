@@ -1,0 +1,35 @@
+{
+  "configurations": [
+    {
+      "name": "windows-gcc-x86",
+      "includePath": [
+        "${workspaceFolder}/**"
+      ],
+      "defines": [
+        "_DEBUG",
+        "UNICODE",
+        "__GNUC__=6",
+        "__cdecl=__attribute__((__cdecl__))"
+      ],
+      "intelliSenseMode": "windows-gcc-x86",
+      "browse": {
+        "limitSymbolsToIncludedHeaders": true,
+        "databaseFilename": "",
+        "path": [
+          "${workspaceRoot}",
+          "d:/mingw/include/**",
+          "d:/mingw/bin/../lib/gcc/mingw32/9.2.0/include/c++",
+          "d:/mingw/bin/../lib/gcc/mingw32/9.2.0/include/c++/mingw32",
+          "d:/mingw/bin/../lib/gcc/mingw32/9.2.0/include/c++/backward",
+          "d:/mingw/bin/../lib/gcc/mingw32/9.2.0/include",
+          "d:/mingw/bin/../lib/gcc/mingw32/9.2.0/../../../../include",
+          "d:/mingw/bin/../lib/gcc/mingw32/9.2.0/include-fixed"
+        ]
+      },
+      "cStandard": "${default}",
+      "cppStandard": "${default}",
+      "compilerPath": "D:/MinGw/bin/gcc.exe"
+    }
+  ],
+  "version": 4
+}
