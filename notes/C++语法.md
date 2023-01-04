@@ -29,7 +29,7 @@
 
    
 
-#  2.一个指针指向"元素类型为int" 的vector
+#  2.一个指针指向"元素类型为int"的vector
 
 ````C++
 vector<int> *pv  = 0;
@@ -113,7 +113,7 @@ int main(){
 
 
 
-# 5. 自定义构造函数
+# 5.自定义构造函数
 
 ```C++
 #include<iostream>
