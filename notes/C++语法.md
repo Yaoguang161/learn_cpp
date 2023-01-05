@@ -429,3 +429,40 @@ int main(){
 
 * 其次 unique_ptr 是删除了拷贝构造函数的
 * unique是不能被拷贝的
+
+## 6.3动态内存管理
+
+* 分配通过new,释放通过delete,堆内存由程序员自行管理
+
+* C++没有提供任何语法让我们得以从heap分配数组的同时为其元素设定初值
+
+* 如果要删除数组中的所有对象,必须是在数组指针和delete表达式之间,加上一个空的下标运算符  `delete [] pia;`
+
+  
+
+# 7.一些关键字的使用
+
+* `inline`仅仅是一种请求而没有强制性,最适合声明我inline的函数: 体积小,常被调用,所从事的计算并不复杂.`inline bool fibon_elem(int pos,int &elem)`
+
+# 8.模板函数
+
+```C++
+void display_message(const string &, const vector<int>&);
+void display_message(const string &, const vector<double>&);
+void display_message(const string &, const vector<string>&);
+```
+
+使用`template`模板类替换,重载使代码更优雅
+
+```C++
+template <typename elemType>
+void display_message(const string &msg, const vector<elemType> &vec){
+    cout << msg;
+    for(int ix = 0; ix <vec.size(); ++ix)
+    {
+        elemType t = vec[ix];
+        cout << t << ' ';
+    }
+}
+```
+
