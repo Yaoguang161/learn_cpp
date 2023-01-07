@@ -1,12 +1,21 @@
 * [1.如何实现线程安全](#1-C++如何实现线程安全)
-
 * [2.需要一个指针,指向一个"元素类型为int"的vector](#2.一个指针指向"元素类型为int" 的vector)
-
 * [3. RAII与智能指针](#3.RAII与智能指针)
-
 * [4.lambda表达式替换案例](#4.lambda表达式替换案例)
 * [5.自定义构造函数](#5. 自定义构造函数)
   * [5.1三五法则](#5.1三五法则)
+  * [5.2 C++11:为什么区分拷贝和移动?](#5.2 C++11:为什么区分拷贝和移动?)
+  * [5.3移动进阶: 交换两者的值](#5.3移动进阶: 交换两者的值)
+  * [5.4哪些情况会触发"移动" ](#5.4哪些情况会触发"移动" )
+* [6.智能指针](#6.智能指针)
+  * [6.1RAII解决内存管理的问题: unique_ptr](#6.1RAII解决内存管理的问题: unique_ptr)
+  * [6.2 防止悬空指针](#6.2 防止悬空指针)
+  * [6.3动态内存管理](#6.3动态内存管理)
+  * [6.4更智能的指针: shared_ptr](#6.4更智能的指针:shared_ptr)
+  * [6.5解决循环引用: 解决方案1](6.5 解决循环引用: 解决方案1)
+
+* [7.一些关键字的使用](#7.一些关键字的使用)
+* [8.模板函数](#8.模板函数)
 
 
 
@@ -439,6 +448,94 @@ int main(){
 * 如果要删除数组中的所有对象,必须是在数组指针和delete表达式之间,加上一个空的下标运算符  `delete [] pia;`
 
   
+
+## 6.4更智能的指针:shared_ptr
+
+使用起来困难的原因, 在于unique_ptr解决重复释放的方式是禁止拷贝, 这样虽然有更高的效率,但导致使用困难, 容易犯错等
+
+相比之下, 牺牲效率换来自由度的 `shared_ptr`则允许拷贝, 他解决重复释放的方式是通过引用计数:
+
+1. 当一个`shared_ptr`初始化时, 将计数器设为1.
+2. 当一个`shared_ptr`被拷贝时, 计数器加1
+3. 当一个`shared_ptr`被解构时, 计数器减1, 减到0时, 则自动销毁他指向的对象
+
+* 从而可以保证, 只要还有存在哪怕一个指针指向该对象, 就不会被解构
+
+* 可以使用`use_count()`获取引用计数
+
+  
+
+  
+
+## 6.5解决循环引用: 解决方案一
+
+   把其中逻辑上"不具有所有权" 的拿一个改成`weak_ptr`即可: 
+
+* 因为父窗口"拥有"子窗口是天经地义的, 而子窗口并不"拥有"父窗口
+
+* 其实主要是一个父窗口可以有多个子窗口, 只有规定子窗口从属于父窗口才能解决引用计数的问题
+
+  ```c++
+  #include<memory>
+  struct C{
+      std::shared_ptr<C>  m_child;
+      std::weak_ptr<C> m_parent;
+  };
+  int main(){
+      auto parent = std::make_shared<C> ();
+      auto child = std::make_shared<C> ();
+      
+      //建立相互引用:
+      parent->m_child = child;
+      child ->m_parent = parent;
+      
+      parent = nullptr;  //parent 会被释放, 因为child 指向他的是 **弱引用**
+    
+      child =nullptr;  //child 会被释放. 因为指向child 的parent 已经释放了
+      
+      return 0;
+      
+  }
+  
+  
+  ```
+
+可以把C *理解为`unique_ptr`的弱引用. 
+
+`weak_ptr`理解为`shared_ptr`的弱引用.
+
+但`weak_ptr`能提供失效检测, 更安全.
+
+```c++
+int main(){
+    std::shared_ptr<C> p  = std::make_shared<C> ();  //引用计数初始化为1
+    
+    printf("use count = %ld\n ",p.use_count());  //1
+    
+    std::weak_ptr<C> weak_p = p ;  //创建一个不影响计数器的弱引用
+    
+    printf("use count = %ld \n", p.use_count()) ;    // 1
+    
+    func(std::move(p));   //控制权转移, p 变成 null, 引用计数加不变
+    
+    if(weak_p.expired())
+        printf("错误: 弱引用已经失效");
+    else
+        weak_p.lock() -> do_something();  // 正常执行, p的生命周期仍被 objlist延续着
+    
+    objlist.clear();    // 刚刚p移交给func的生命周期结束了! 引用计数减1, 变成0了
+    
+    if(weak_p.expired())       //因为shared_ptr 指向的对象已经释放,弱引用会失效
+        printf("错误: 弱引用已经失效~ ");
+    else
+        weak_p.lock() -> do_something(); //不会执行
+    
+    return 0; //到这里最后一个弱引用weak_p 也会被释放, 他指向的"管理块" 被释放
+            
+}
+```
+
+
 
 # 7.一些关键字的使用
 
