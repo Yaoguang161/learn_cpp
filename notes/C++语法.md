@@ -643,3 +643,100 @@ void display_message(const string &msg, const vector<elemType> &vec){
 }
 ```
 
+* 建议模板不要分离声明和定义,直接写在头文件里即可. 如果分离还要罗列出所有模板参数的排列组合,违背开闭原则
+
+1. 类型作为参数 : `template<class T>`
+
+2. 整数作为参数: `template <int N>`
+
+3. 定义默认参数: `template <int N  = 0, class T = int >`
+
+4. 使用模板函数: `myfunc<T,N>(...)`
+
+5. 模板函数可以自动推断类型,从而参与重载
+
+6. 模板具有惰性, 多次编译的特点
+
+   ​                                                                                      
+
+# 9.自动类型推导auto
+
+一些局限性:
+
+1. 因为需要等号右边的类型信息,所有没有 = 单独声明一个auto变量是不行的
+
+   ```C++
+   auto p;
+   p = std::make_shared<MyClssWithVeryLongName>();
+   ```
+
+2. 而且类成员也不可以定义为`auto`
+
+   ```C++
+   struct MyClassWithVeryLongName{
+       auto x = std::make_shared<int>();
+   };
+   ```
+
+   
+
+# 10 .C++特征:引用(int &)
+
+* 引用的本质无非是指针,当我们试图修改一个引用时,实际上修改了原来的对象:
+
+  ```C++
+  #include<cstdio>
+  
+  int main(){
+      int x = 233;
+      int &ref = x;
+      ref = 42;
+      printf("%d\n",x);    //42
+      x = 1024;
+      printf("%d\n", ref);  // 1024
+  }
+  
+  //修改ref后, x 也会变化, 修改x后, ref也会变化
+  
+  ```
+
+  以上代码等价于:
+
+  ```C++
+  #include<cstdio>
+  
+  int main(){
+  	int x = 233;
+      int *ref = &x;
+      *ref = 42;
+      printf("%d\n",x);    // 42
+      x = 1024;
+      printf("%d\n",*ref);  // 1024
+  }
+  ```
+
+  
+
+# 11.C++特性: 常引用(int const &)
+
+* 如果说`int &` 相当于`int *`,那么`int const &`就相当于`int const *`
+
+* `const`修饰符的存在, 使得`ref`不能被写入(赋值)
+
+* 这样的好处是更加安全(编译器也能够放心大胆地做自动优化)
+
+  ```C++
+  #include<cstdio>
+  
+  int main(){
+      int x = 233;
+      int const &ref = x;
+      //ref = 42;    //会出错
+      printf("%d\n",x);    //233
+      x = 1024;
+      printf("%d\n", ref);  // 1024
+  }
+  ```
+
+  
+
