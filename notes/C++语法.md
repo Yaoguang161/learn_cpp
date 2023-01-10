@@ -11,7 +11,6 @@
 
 4. 使用原子操作(atomic operation): 原子操作是一种在单个操作内完成的操作, 它不会被其他线程打断. C++的原子操作可以使用`std::atomic`来实现.
 
-   
 
 # 2.一个指针指向"元素类型为int"的vector
 
@@ -47,10 +46,6 @@ for(int ix = 0; ix < seq_cnt; ++ ix){
     //要显示的元素都通过current_vec间接访问到
 }
 ```
-
-
-
-
 
 # 3.RAIA与智能指针
 
@@ -270,8 +265,6 @@ return c2;              //移动赋值函数
 
 
 
-
-
 ## 5.3C++11:为什么区分拷贝和移动?
 
 * 有时候,我们需要把一个对象v2移动到v1上,而不需要涉及实际数据的拷贝.
@@ -307,8 +300,6 @@ void test_move(){
 
 
 
-
-
 ## 5.4移动进阶: 交换两者的值
 
 * 除了`std::move`可以把v2移动到v1外,
@@ -331,8 +322,6 @@ void test_move(){
   
   ```
 
-  
-
 * 这些情况下编译器会调用**拷贝**
 
   ```C++
@@ -347,12 +336,17 @@ void test_move(){
   std::as_constd(v2)      //不会拷贝v2,需要拷贝可以用{auto_ = v2;}
   ```
 
-  
 
 ```c++
 std::move(t) 相当于 (T &&) t
 std::as_const(t)  相当于(T const &)t
 ```
+
+
+
+
+
+
 
 
 
@@ -373,6 +367,62 @@ std::as_const(t)  相当于(T const &)t
 * void addObject(std::shated_ptr<Object> obj);
 * 如果是智能指针但是**不需要生命周期**,则通过.get获取原始指针后,按值传递:
 * void  modifyObject(Object *obj);
+
+
+
+
+
+
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -407,6 +457,10 @@ int main(){
     return 0;  //自动释放 p
 }
 ```
+
+
+
+
 
 ## 6.2 防止悬空指针
 
@@ -448,6 +502,10 @@ int main(){
 
 * 其次 unique_ptr 是删除了拷贝构造函数的
 * unique是不能被拷贝的
+
+
+
+
 
 ## 6.3动态内存管理
 
@@ -549,6 +607,8 @@ int main(){
 
 
 
+
+
 ## 6.5解决循环引用:解决方案二
 
 父对象使用原始指针
@@ -577,9 +637,15 @@ int main(){
 
 
 
+
+
 # 7.一些关键字的使用
 
 * `inline`仅仅是一种请求而没有强制性,最适合声明我inline的函数: 体积小,常被调用,所从事的计算并不复杂.`inline bool fibon_elem(int pos,int &elem)`
+
+
+
+
 
 # 8.模板函数
 
@@ -615,9 +681,14 @@ void display_message(const string &msg, const vector<elemType> &vec){
 
 5. 模板函数可以自动推断类型,从而参与重载
 
-6. 模板具有惰性, 多次编译的特点
+6. 模板具有惰性, 多次编译的特点                                                                                    
 
-   ​                                                                                      
+
+
+
+
+
+
 
 # 9.自动类型推导auto
 
@@ -638,7 +709,10 @@ void display_message(const string &msg, const vector<elemType> &vec){
    };
    ```
 
-   
+
+
+
+
 
 # 10 .C++特征:引用(int &)
 
@@ -675,7 +749,10 @@ void display_message(const string &msg, const vector<elemType> &vec){
   }
   ```
 
-  
+
+
+
+
 
 # 11.C++特性: 常引用(int const &)
 
@@ -698,11 +775,13 @@ void display_message(const string &msg, const vector<elemType> &vec){
   }
   ```
 
-  
-
 * 也可以有`auto` 来实现, `auto const &`  或`auto &`
 
 * 函数也可以返回引用
+
+
+
+
 
 #  12.const的用法
 
@@ -725,13 +804,11 @@ const int* const a = & [4]    //常量数据的常量指针
 
 [4]为**指针本身**和指向的**内容**均为常量。  
 
-
-
-
-
 * 忽略类型就是`* const p`和`const *p`.  前者`p`不能改,即不能改指向, `p`不能指向另一个变量; 后者`*p`不能改,就是指向的内容`*p`不能改
 * 举例子: `const int *p` 和`int const *p`是一样的,但是 `int* const p`和`int const *p`不一样
 * `const int* p`和`int const *p`是一样的
+
+
 
 
 
@@ -762,3 +839,277 @@ int main(){
 }
 ```
 
+
+
+## 13.1tuple:结构化绑定
+
+```C++
+#include<iostream>
+#include<tuple>
+
+int main(){
+    auto tup = std::tuple(3,3.14f,'h');
+    
+    auto [first,second,third] = tup;
+    //结构化绑定也支持绑定为引用:
+    //auto &[x,y...] = tup;
+    
+    
+    std::cout << first  <<std::endl;
+    std::cout << second <<std::endl;
+    std::cout << third  <<std::endl;
+        
+    return 0;
+}
+```
+
+
+
+* 结构化绑定为万能推导但是不是`decltype(auto)`
+
+  ```C++
+  auto &&[x,y,...] = tup;  //正确
+  decltype(auto)[x,y,..] = tup; //错误 !
+  
+  ```
+
+
+
+* 结构化绑定: 还可以是任意自定义类
+
+  ```C++
+  #include<iostream>
+  #include<tuple>
+  
+  struct MyClass{
+      int x;
+      float y;
+  };
+  
+  int main(){
+      MyClass mc = {42, 3.14f};
+      
+      //这里也可以是结构化绑定
+      auto [x,y] = mc;
+      
+      std::cout << x << ","
+      
+      return 0;
+  }
+  
+  ```
+
+* tuple:用于函数多个返回值
+
+  ```C++
+  #include<iostream>
+  #include<tuple>
+  #include<cmath>
+  
+  std::tuple<bool,float> mysqlt(float x){
+      if(x >= 0.f){
+          return {true, std::sqrt(x)};
+      }else{
+          return {false,0.0f};
+      }
+  }
+  int main(){
+      auto [success,value] = mysqrt(3.f);
+      if(success){
+          printf("成功!结果为: %f\n",value);
+      }else{
+          printf("失败 !找不到平方根!\n");
+      }
+      return 0;
+  }
+  ```
+
+  
+
+  
+
+    
+
+
+
+# 14.常用容器: optional
+
+* 上个例子用`std::tuple<bool,T>`其中第一个bool表示成功与否. 但是这样尽管失败了还是需要指定一个值`0.0f`,非常麻烦
+
+* 这种情况推荐用`std::optional<T>`
+
+* 成功时,直接返回`T`. 失败时,只需返回`std::nullopt`即可
+
+  ```C++
+  #include<iostream>
+  #include<optional>
+  #include<cmath>
+  
+  std::optional<float> mysqrt(float x){
+      if (x >= 0.f){
+          return std::sqrt(x);
+      }else{
+          return std::nullopt;   //注意哦: nullopt和null是完全不一样的
+      }
+  }
+  int main(){
+      auto ret = mysqrt(3.f);
+      if(ret.has_value()){
+          printf("成功! 结果为: %f\n",ret.value());
+      }else{
+          printf("失败! 找不到平方根! \n");
+      }
+      return 0;
+  }
+  ```
+
+  
+
+* `optional: value()`会检测是否为空, 空则抛出异常
+
+* 当`ret`没有值时(即`nullopt`), `ret.value()`会抛出一个异常,类型为`std::bad_optional_access`
+
+  
+
+# 15.常用容器:variant
+
+* `variant`:更安全的`union`,存储多个不同类型的值
+* 有时候需要一个类型"要么存储int,要么存储float",这时候可以用`std::variant<int,float>`
+* 和`union`相比,variant符合RAII思想,更加安全易用
+* 给`variant`赋值只需要用普通的 = 即可. 
+* 容器的选择:
+  * `variant`的特点是只存储其中一种类型
+  * `tuple`的特点是每个类型都有存储
+
+```C++
+#include<iostream>
+#include<variant>
+int main(){
+    std::variant<int,float> v = 3;  //选择其中的一个容器
+    
+    std::cout << std::get<int>(v) << std::endl;  //3
+    std::cout << std::get<0>(v) << std::endl;  //3
+    
+    v = 3.14f;
+    
+    std::cout << std::get<float>(v) << std::endl;  // 3.14f
+    std::cout << std::get<int>(v) << std::endl;  //  运行时错误
+    
+    
+    return 0;
+}
+```
+
+* 要获取某个类型的值,比如要获取`int`用`std::get<int>`,如果当前`variant`里不是这个类型,就会抛出异常`std::bad_variant_access`
+
+
+
+* 那么如果判断当前是哪个类型呢?
+  * 可以用`std::holds_alternative<int>`判断当前里存储的是不是`int`.
+
+​	
+
+``` C++
+#include<iostream>
+#include<variant>
+void printf(std::variant<int,float> const &v){
+    if(std::holds_alternative<int>(v)){
+        std::cout << std::get<int>(v) << std::endl;
+    }else if(std::holds_alternative<float>(v)){	
+        std::cout << std::get<float>(v) << std::endl;
+	}
+}
+
+int main(){
+    
+    std::variant<int,float> v = 3;
+    printf(v);
+    v = 3.14f;
+    printf(v);
+    
+    return 0;
+}
+
+```
+
+
+
+* 判断当前是哪个类型用`v.index()`,判断当前是参数列表中的第几个类型.
+
+  ```C++
+  #include<iostream>
+  #include<variant>
+  void printf(std::variant<int,float> const &v){
+      if(v.index() == 0){
+          std::cout << std::get<int>(v) << std::endl;
+      }else if(v.index() == 1){	
+          std::cout << std::get<float>(v) << std::endl;
+  	}
+  }
+  
+  int main(){
+      
+      std::variant<int,float> v = 3;
+      printf(v);
+      v = 3.14f;
+      printf(v);
+      
+      return 0;
+  }
+  #include
+  ```
+
+  
+
+* 批量匹配 `std::visit`:
+
+* 可以有多个`variant`作为参数
+
+* 相应的lambda的参数数量要与之匹配
+
+* `std::visit`会自动罗列出所有的排列组合
+
+* 但是会编译变慢
+
+  
+
+```C++
+auto add(std::variant<int,float> const &v1,
+        std::variant<int,float> const &v2,){
+    std::variant<int,float> ret;
+    std::visit([&](auto const &t1, auto const &t2){   //先判断是不是int + int,判断是不是float +float  ,最后判断是不是int + float , 判断是不是float + int
+       ret = t1 + t2; 
+    },v1,v2);
+    return ret ;
+}
+
+
+int main(){
+    std::variant<int,float> v = 3;
+    print(add(v,3.14f));
+    return 0;
+}
+
+
+//6.14
+```
+
+
+
+* `std::visit`可以有返回值
+
+* `std::visit`里面lambda可以有返回值, 不过都得同样类型
+
+* 利用这一点进一步优化
+
+  ```C++
+  auto add(std::variant<int,float> const &v1,
+          std::variant<int,float> const &v2){
+      return std::visit([&](auto const &t1, auto const &t2)
+       			-> std::variant<int,float>{
+            return t1 + t2;
+      },v1,v2)
+  }
+  ```
+
+  
