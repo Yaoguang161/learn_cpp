@@ -1,31 +1,5 @@
-<a name="index">**Index**</a>
-<a href="#0">1.C++如何实现线程安全</a>  
-<a href="#1">2.一个指针指向"元素类型为int"的vector</a>  
-<a href="#2">3.RAIA与智能指针</a>  
-<a href="#3">4. lambda表达式替换案例</a>  
-<a href="#4">5.自定义构造函数</a>  
-&emsp;<a href="#5">5.1三五零法则</a>  
-&emsp;<a href="#6">5.2什么时候需要担心三五法则</a>  
-&emsp;<a href="#7">5.3C++11:为什么区分拷贝和移动?</a>  
-&emsp;<a href="#8">5.4移动进阶: 交换两者的值</a>  
-&emsp;<a href="#9">5.5哪些情况会触发"移动" </a>  
-&emsp;<a href="#10">5.6函数参数类型优化规则: 按引用还是按值?</a>  
-<a href="#11">6.智能指针</a>  
-&emsp;<a href="#12">6.1RAII解决内存管理的问题: unique_ptr</a>  
-&emsp;<a href="#13">6.2 防止悬空指针</a>  
-&emsp;<a href="#14">6.3动态内存管理</a>  
-&emsp;<a href="#15">6.4更智能的指针:shared_ptr</a>  
-&emsp;<a href="#16">6.5解决循环引用:解决方案一</a>  
-&emsp;<a href="#17">6.5解决循环引用:解决方案二</a>  
-<a href="#18">7.一些关键字的使用</a>  
-<a href="#19">8.模板函数</a>  
-<a href="#20">9.自动类型推导auto</a>  
-<a href="#21">10 .C++特征:引用(int &)</a>  
-<a href="#22">11.C++特性: 常引用(int const &)</a>  
-<a href="#23"> 12.const的用法</a>  
 
-
-# <a name="0">1.C++如何实现线程安全</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# 1.C++如何实现线程安全
 
 实现线程安全通常有一下集中方法:
 
@@ -39,7 +13,7 @@
 
    
 
-# <a name="1">2.一个指针指向"元素类型为int"的vector</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# 2.一个指针指向"元素类型为int"的vector
 
 ````C++
 vector<int> *pv  = 0;
@@ -78,9 +52,9 @@ for(int ix = 0; ix < seq_cnt; ++ ix){
 
 
 
-# <a name="2">3.RAIA与智能指针</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# 3.RAIA与智能指针
 
-# <a name="3">4. lambda表达式替换案例</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# 4. lambda表达式替换案例
 
 ```C++
 #include<vector>
@@ -123,7 +97,7 @@ int main(){
 
 
 
-# <a name="4">5.自定义构造函数</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# 5.自定义构造函数
 
 ```C++
 #include<iostream>
@@ -239,14 +213,14 @@ struct Pig{
 }
 ```
 
-## <a name="5">5.1三五零法则</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+## 5.1三五零法则
 
 1. 如果一个类定义了**析构函数**, 那么必须同时定义或删除**拷贝构造函数**和**拷贝赋值函数,**否则出错.
 2. 如果一个类定义了**拷贝构造函数**,那么您必须同时定义或删除**拷贝赋值函数**,否则出错,删除可导致低效.
 3. 如果一个类定义了**移动构造函数**, 那么您必须同时定义或删除**移动赋值函数**,否则出错,删除可导致低效.
 4. 如果一个类定义了**拷贝构造函数**或**拷贝赋值函数**,那么您最好同时定义**移动构造函数**或**移动赋值函数**,否则低效.
 
-## <a name="6">5.2什么时候需要担心三五法则</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+## 5.2什么时候需要担心三五法则
 
 * 一般来说,可以可以认为符合三五法则的类型是安全的
 * 以下类型是安全的:
@@ -266,18 +240,6 @@ struct Pig{
 * std::vector<Object *> objs;       //STL容器, 但存了不安全的对象
 
   
-
-
-
-
-
-
-
-![image-20230104215907008](C:\Users\Asaki\AppData\Roaming\Typora\typora-user-images\image-20230104215907008.png)
-
-![image-20230104215930751](C:\Users\Asaki\AppData\Roaming\Typora\typora-user-images\image-20230104215930751.png)
-
-
 
 举例子
 
@@ -310,7 +272,7 @@ return c2;              //移动赋值函数
 
 
 
-## <a name="7">5.3C++11:为什么区分拷贝和移动?</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+## 5.3C++11:为什么区分拷贝和移动?
 
 * 有时候,我们需要把一个对象v2移动到v1上,而不需要涉及实际数据的拷贝.
 * 时间复杂度:移动是O(1), 拷贝是O(n)
@@ -347,7 +309,7 @@ void test_move(){
 
 
 
-## <a name="8">5.4移动进阶: 交换两者的值</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+## 5.4移动进阶: 交换两者的值
 
 * 除了`std::move`可以把v2移动到v1外,
 * 还可以通过`std::swap`交换v1和v2
@@ -357,7 +319,7 @@ void test_move(){
 
 
 
-## <a name="9">5.5哪些情况会触发"移动" </a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+## 5.5哪些情况会触发"移动" 
 
 * 这些情况编译器会调用**移动**:
 
@@ -396,7 +358,7 @@ std::as_const(t)  相当于(T const &)t
 
 
 
-## <a name="10">5.6函数参数类型优化规则: 按引用还是按值?</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+## 5.6函数参数类型优化规则: 按引用还是按值?
 
 * 用常引用来避免深拷贝
 * 如果是基础类型(比如int , float) 则按值传递:
@@ -416,9 +378,9 @@ std::as_const(t)  相当于(T const &)t
 
 
 
-# <a name="11">6.智能指针</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# 6.智能指针
 
-## <a name="12">6.1RAII解决内存管理的问题: unique_ptr</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+## 6.1RAII解决内存管理的问题: unique_ptr
 
 ```C++
 #include<cstdio>
@@ -446,7 +408,7 @@ int main(){
 }
 ```
 
-## <a name="13">6.2 防止悬空指针</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+## 6.2 防止悬空指针
 
 * 释放一个指针后,必须把这个指针设成NULL, 防止空悬指针
 
@@ -487,7 +449,7 @@ int main(){
 * 其次 unique_ptr 是删除了拷贝构造函数的
 * unique是不能被拷贝的
 
-## <a name="14">6.3动态内存管理</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+## 6.3动态内存管理
 
 * 分配通过new,释放通过delete,堆内存由程序员自行管理
 
@@ -497,7 +459,7 @@ int main(){
 
   
 
-## <a name="15">6.4更智能的指针:shared_ptr</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+## 6.4更智能的指针:shared_ptr
 
 使用起来困难的原因, 在于unique_ptr解决重复释放的方式是禁止拷贝, 这样虽然有更高的效率,但导致使用困难, 容易犯错等
 
@@ -517,7 +479,7 @@ int main(){
 
   
 
-## <a name="16">6.5解决循环引用:解决方案一</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+## 6.5解决循环引用:解决方案一
 
    把其中逻辑上"不具有所有权" 的拿一个改成`weak_ptr`即可: 
 
@@ -587,7 +549,7 @@ int main(){
 
 
 
-## <a name="17">6.5解决循环引用:解决方案二</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+## 6.5解决循环引用:解决方案二
 
 父对象使用原始指针
 
@@ -615,11 +577,11 @@ int main(){
 
 
 
-# <a name="18">7.一些关键字的使用</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# 7.一些关键字的使用
 
 * `inline`仅仅是一种请求而没有强制性,最适合声明我inline的函数: 体积小,常被调用,所从事的计算并不复杂.`inline bool fibon_elem(int pos,int &elem)`
 
-# <a name="19">8.模板函数</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# 8.模板函数
 
 ```C++
 void display_message(const string &, const vector<int>&);
@@ -657,7 +619,7 @@ void display_message(const string &msg, const vector<elemType> &vec){
 
    ​                                                                                      
 
-# <a name="20">9.自动类型推导auto</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# 9.自动类型推导auto
 
 一些局限性:
 
@@ -678,7 +640,7 @@ void display_message(const string &msg, const vector<elemType> &vec){
 
    
 
-# <a name="21">10 .C++特征:引用(int &)</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# 10 .C++特征:引用(int &)
 
 * 引用的本质无非是指针,当我们试图修改一个引用时,实际上修改了原来的对象:
 
@@ -715,7 +677,7 @@ void display_message(const string &msg, const vector<elemType> &vec){
 
   
 
-# <a name="22">11.C++特性: 常引用(int const &)</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# 11.C++特性: 常引用(int const &)
 
 * 如果说`int &` 相当于`int *`,那么`int const &`就相当于`int const *`
 
@@ -742,7 +704,7 @@ void display_message(const string &msg, const vector<elemType> &vec){
 
 * 函数也可以返回引用
 
-# <a name="23"> 12.const的用法</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+#  12.const的用法
 
 如果const位于星号*的左侧，则const就是用来修饰指针所指向的变量，即指针指向为常量；
 
@@ -770,3 +732,33 @@ const int* const a = & [4]    //常量数据的常量指针
 * 忽略类型就是`* const p`和`const *p`.  前者`p`不能改,即不能改指向, `p`不能指向另一个变量; 后者`*p`不能改,就是指向的内容`*p`不能改
 * 举例子: `const int *p` 和`int const *p`是一样的,但是 `int* const p`和`int const *p`不一样
 * `const int* p`和`int const *p`是一样的
+
+
+
+# 13.常用容器:tuple
+
+* `std::tuple<...>`可以将多个不同类型的值**打包**成一个.尖括号里填各个元素的类型.
+* 之后可以用`std::get<0>`获取第0个元素,`std::get<1>`获取第一个元素,以此类推(从0开始数)
+
+```C++
+#include<iostream>
+#include<tuple>
+
+int main(){
+    auto tup = std::tuple<int, float, char>(3, 3.14f, 'h');
+
+    int first = std::get<0>(tup);
+    float second = std::get<1>(tup);
+    char third = std::get<2>(tup);
+
+
+    std::cout << first << std::endl;
+    std::cout << second << std::endl;
+    std::cout << third << std::endl;
+
+
+    system("pause");
+    return 0;
+}
+```
+
