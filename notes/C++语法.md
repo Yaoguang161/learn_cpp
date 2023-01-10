@@ -732,7 +732,7 @@ void display_message(const string &msg, const vector<elemType> &vec){
       int x = 233;
       int const &ref = x;
       //ref = 42;    //会出错
-      printf("%d\n",x);    //233
+      printf("%d\n",x);    //   233
       x = 1024;
       printf("%d\n", ref);  // 1024
   }
@@ -740,3 +740,35 @@ void display_message(const string &msg, const vector<elemType> &vec){
 
   
 
+* 也可以有`auto` 来实现, `auto const &`  或`auto &`
+
+* 函数也可以返回引用
+
+#  12.const的用法
+
+如果const位于星号*的左侧，则const就是用来修饰指针所指向的变量，即指针指向为常量；
+
+如果const位于星号的右侧，const就是修饰指针本身，即指针本身是常量。
+
+
+
+```C++
+const int* a = & [1]          //非常量数据的常量指针    指针常量
+int const *a = & [2]          //非常量数据的常量指针     a is a pointer to the constant char variable
+int* const a = & [3]          //常量数据的非常量指针指针常量 常量指针 a is a constant pointer to the (non-constant) char variable
+const int* const a = & [4]    //常量数据的常量指针
+```
+
+因此，[1]和[2]的情况相同，都是指针所指向的**内容**为常量，这种情况下不允许对**内容**进行更改操作，如不能*a = 3 ；
+
+[3]为指针本身是常量，而指针所指向的内容不是常量，这种情况下不能对**指针本身**进行更改操作，如a++是错误的；
+
+[4]为**指针本身**和指向的**内容**均为常量。  
+
+
+
+
+
+* 忽略类型就是`* const p`和`const *p`.  前者`p`不能改,即不能改指向, `p`不能指向另一个变量; 后者`*p`不能改,就是指向的内容`*p`不能改
+* 举例子: `const int *p` 和`int const *p`是一样的,但是 `int* const p`和`int const *p`不一样
+* `const int* p`和`int const *p`是一样的
