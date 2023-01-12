@@ -1264,7 +1264,7 @@ int main(){
         download("hello.zip");
     });
     interact();
-    std::cout << "Waiting for chiild thread..." << std::endl;
+    std::cout << "Waiting for child thread..." << std::endl;
     t1.join();
     std::cout << "Child thread exited! " << std::endl;
     return 0;
@@ -1519,3 +1519,123 @@ int main(){
 
 ## 24.2 `std::lock_guard`: 符合RAII思想的上锁和解锁
 
+* 根据RAII思想,可将锁的持有视为资源,上锁视为锁的获取,解锁视为锁的释放
+
+* `std::lock_guard`就是这样一个工具类,他的构造函数里会调用`mtx.lock()`,结构函数会调用`mtx.unlock()`.从而退出函数作用域时能自动解锁,避免程序员粗心不小心忘记解锁
+
+  ```C++
+  #include<iostream>
+  #include<stirng>
+  #include<thread>
+  #include<vector>
+  #include<mutex>
+  
+  int main(){
+      std::vector<int> arr;
+      std::mutex mtx;
+      std::thread t1([&]{
+          for(int i = 0; i < 1000; i ++){
+              std::lock_guard grd(mtx);
+              arr.push_back(1);
+          }
+      });
+      
+      std::thread t1([&]{
+          for(int i = 0; i < 1000; i ++){
+              std::lock_guard grd(mtx);
+              arr.push_back(2);
+          }
+      });
+      t1.join();
+      t2.join();
+     
+      return 0;
+  }
+  ```
+
+  
+
+## 24.3 `std::unique_lock`:也符合RAII思想,但自由度更高
+
+* `std::lock_guard`严格在解构时 `unlock()`, 但是有时候我们会希望提前`unlock()`.这时可以用`std::unique_lock`,他额外存储了一个`flag`表示是否已经被释放. 他会在解构检测这个`flag`,如果没有释放,则调用`unlock()`,否则不调用
+
+* 然后可以直接调用`unique_lock`的`unlock()`函数来提前解锁,但是即使忘记解锁也没关系,退出作用域时候`他还会自动检查一下要不要解锁
+
+  ```C++
+  #include<iostream>
+  #include<string>
+  #include<thread>
+  #include<vector>
+  #include<mutex>
+  
+  int main(){
+      std::vector<int> arr;
+      std::mutex mtx;
+      std::thread t1([&]{
+          for(int i = 0; i < 1000; i ++){
+              std::unique_lock grd(mtx);
+              arr.push_back(1);
+          }
+      });
+      std::thread t2([&]{
+          for(int i = 0; i < 1000; i++){
+              std::unique_lock grd(mtx);
+              arr.push_back(2);
+              grd.unlock();
+              printf("outside of lock\n");
+              //grd.lock();     //如果需要, 还可以从新上锁
+          }
+      });
+      t1.join();
+      t2.join();
+      return 0;
+      
+  }
+  ```
+
+  
+
+* `sdt::unique_lock`: 用`std::defer_lock`作为参数
+
+  * `std::unique_lock`的构造函数还可以有一个额外参数,那就是`std::defer_lock`
+
+  * 指定了这个参数的话,`std::unique_lock`不会在构造函数中调用`mtx.lock()`,需要之后再手动调用`grd.lock()`才能上锁
+
+  * 好处依然是忘记了`grd.unlock()`也能够自动调用`mtx.unlock()`
+
+  * ```C++
+    #include<iostream>
+    #include<string>
+    #include<thread>
+    #include<vector>
+    #include<mutex>
+    
+    int main(){
+        std::vector<int> arr;
+        std::mutex mtx;
+        sdt::thread t1([&]{
+            for(int i = 0; i <  1000; i ++){
+                std::unique_lock grd(mtx);
+                arr.push_back(1);
+            }
+        });
+        
+        std::thread t2([&]{
+            for(int i = 0; i< 1000; i++){
+                std::unique_lock grd(mtx,std::defer_lock);  //
+                printf("before the lock\n"); 
+                grd.lock();                                 //
+                arr.push_back(2);
+                grd.unlock();
+                printf("outside of lock\n");
+            }
+        });
+        
+        t1.join();
+        t2.join();
+        
+        return 0;
+    }
+    ```
+
+  * 
