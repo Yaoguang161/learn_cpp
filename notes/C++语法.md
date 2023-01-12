@@ -1113,3 +1113,409 @@ int main(){
   ```
 
   
+
+
+
+
+
+# 16. C++引入的时间标准库
+
+```C++
+auto t0 = chrono::steady_clock::now();          //获取当前的时间段
+auto t1 = t0 + chrono::seconds(30);           //当前时间点的30秒后
+auto dt = t1 - t0;                           // 获取两个时间点的差(时间段);
+int64_t sec = chrono::druation_cast<chrono::seconds>(dt).count();   // 时间差的秒数
+
+```
+
+
+
+* 跨平台的sleep: `std::this_thread::sleep_for`
+
+* 可以用`std::this_thread::sleep_for`代替`Unix`类操作系统专用的`usleep`,他可以让当前线程休眠一段时间,然后继续
+
+* 而且单位也可以自己指定,比如这里是`milliseconds`表示毫秒,也可以换成`microseconds`表示微秒,`seconds`表示秒,`chrono`的强类型让单位更加自由
+
+* ```C++
+  #include<iostream>
+  #include<thread>
+  #include<chrono>
+  
+  int main(){
+      std::this_thread::sleep_for(std::chrono::milliseconds(400));
+      
+      return 0;
+  }
+  
+  ```
+
+
+
+* 除了接受一个时间段的`sleep_for`,还有接受一个时间点的`sleep_until`,表示让当前的线程休眠到某个时间点
+
+* 等价于上面
+
+  ```C++
+  #include<iostream>
+  #include<thread>
+  #include<chrono>
+  
+  int main(){
+      auto t = std::chrono:steady_clock::now() + std::chrono::millisenconds(400);
+      std::this_thread::sleep_until(t);
+      return 0;
+  }
+  ```
+
+  
+
+# 17. 进程与线程
+
+* **进程**是一应用程序被操作系统拉起来加载到内存之后从开始执行到执行结束的这样一个过程. 简单来说, 进程是程序(应用程序, 可执行文件)的一次执行. 比如双击打开一个桌面应用软件就是开启了一个进程.
+* **线程**是进程中的一个实体,是被系统独立分配和调度的基本单位. 也有说,线程才是CPU可以执行的最小单位. 也就是说,进程本身并不能获取CPU时间,只有它的线程才可以.
+* 从属关系: 进程 > 线程. 一个进程可以拥有多个线程
+* 每个线程共享同样的内存空间, 开销比较小.
+* 每个进程拥有独立的内存空间, 因此开销更大.
+* 对于高性能计算,更好的是多线程.
+* 进程地址独立, 沟通起来困难
+
+
+
+
+
+# 18. 现代C++中的多线程
+
+* C++11开始, 为多线程提供了语言级别的支持. 他开始用`std::thread`这个类来表示线程
+* `std::thread`构造函数的参数可以是任意lambda表达式
+* 当那个线程启动时,会执行这个lambda里的内容
+* 这样就可以一边和用户交互,一边在另一个线程里慢吞吞的下载文件了.
+
+```C++
+#include<iostream>
+#include<thread>
+#include<string>
+
+void download(std::string file){
+    for(int i = 0;i < 10; i ++){
+        std::cout << "Downloading" << file
+            	  << "(" << i * 10 << "%)..." << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(400));
+    }
+    std::cout << "Download complete: " << file << std::endl;
+}
+```
+
+* 然后就会出现一个错误
+
+  * 找不到符号`pthread_create`
+
+  * 原因: `std::thread`的实现背后是基于`pthread`的
+
+  * 解决: `CMakeLists.txt`里连接`Threads::Threads`即可:
+
+    * ```cmake
+      cmake_minimum_required(VERSION 3.10)
+          
+      set(CMAKE_CXX_STANDARD 17)
+          
+      project(cppptest LANGUAGES CXX)
+      
+      add_executable(cpptest main.cpp)
+          
+      find_package(Threads REQUIRED)
+          
+      target_link_libraries(cpptest PUBLIC Threads::Threads)
+      ```
+
+      
+
+
+
+
+
+# 19. 主线程等待子线程结束: t1.join()
+
+* 因此, 我们想要让主线程不要着急退出, 等子线程结束了再退出
+* 可以用`std::thread`类的成员函数`join()`来等待该进程结束
+
+```C++
+#include<iostream>
+#include<thread>
+#include<string>
+
+void download(std::string file){
+    for(int i = 0; i < 10; i++){
+        std::cout << "Downloading" << file
+            << "(" << i *  10 << "%)...." << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(400));
+    }
+    std::cout << "Download complete: " << file << std::endl;
+}
+
+void interact(){
+    std::string name;
+    std::cin >> name;
+    std::cout << "Hi, " << name << std::endl;
+}
+
+
+int main(){
+    std::thread t1([&]{
+        download("hello.zip");
+    });
+    interact();
+    std::cout << "Waiting for chiild thread..." << std::endl;
+    t1.join();
+    std::cout << "Child thread exited! " << std::endl;
+    return 0;
+}
+
+
+```
+
+
+
+# 20.分离线程detach()
+
+* 问题: `std::thread`的析构函数会销毁线程
+* 解决: 调用成员函数`detach()`分离该线程--意味着线程的生命周期不再由当前`std::thread`对象管理,而是在线程退出以后自动销毁自己
+* 不过这样还是会在进程退出时候自动退出
+
+```C++
+#include<iostream>
+#include<thread>
+#include<string>
+
+void download(std::string file){
+    for(int i = 0; i < 10; i++){
+        std::cout << "Downloading" << file
+            << "(" << i *  10 << "%)...." << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(400));
+    }
+    std::cout << "Download complete: " << file << std::endl;
+}
+
+void interact(){
+    std::string name;
+    std::cin >> name;
+    std::cout << "Hi, " << name << std::endl;
+}
+
+void myfunc(){
+    std::thread t1([&]{
+        download("hello.zip");
+    });
+    t1.detach();
+    //t1所代表的线程被分离了, 不在随t1对象销毁
+}
+
+int main(){
+	myfunc();
+    interact();
+    return 0;
+}
+
+
+```
+
+
+
+
+
+
+
+# 21.析构函数不再销毁线程: 移动到全局线程池
+
+* 但是`detach`的问题是进程退出时候不会等待所有子进程执行完毕. 所有另一种解法是把t1对象移动到一个全局变量去,从而延长其生命周期到myfunc函数体外
+
+* 这样就可以等下载完再退出了
+
+  ```C++
+  std::vector<std::thread> pool;
+  
+  void myfunc(){
+      std::thread t1([&]{
+          download("hello.zip");
+      });
+      //移交控制权到全局的 pool列表,以延长t1的生命周期
+      pool.push_back(std::move(t1));
+  }
+  
+  int main(){
+      myfunc();
+      interact();
+      for(auto &t: pool) t.join();  // 等待池里的线程全部执行完毕
+      return 0;
+  }
+  
+  
+  
+  ```
+
+  
+
+
+
+# 22.main函数退出后自动join全部线程
+
+* 但是需要在main里面手动`join`全部线程还是有点麻烦,我们可以自定义一个类ThreadPool,并用他创建一个全局变量,其结构函数会在`main`退出后自动调用
+
+* ```C++
+  class ThreadPool{
+      std::vector<std::thread> m_pool;
+      
+  public:
+      void push_back(std::thread thr){
+          m_pool.push_back(std::move(thr));
+      }
+      
+      ~ThreadPool(){                          //main函数退出后会自动调用
+          for(auto &t: m_pool) t.join();      //等待池里的线程全部执行完毕
+      }    
+  };
+  
+  ThreadPool tpool;
+  
+  void myfunc(){
+      std::thread t1([&]{
+          download("hello.zip");
+      });
+      //移交控制权到全局的pool列表, 以延长t1的生命周期
+      tpool.push_back(std::move(t1));
+  }
+  int main(){
+      myfunc();
+      interact();
+      return 0;
+  }
+  
+  
+  
+  ```
+
+  
+
+
+
+# 23.异步: std::async
+
+* `std::async`接受一个带返回值的`lambda`,自身返回一个`std::futrue`对象
+
+* `lambda`的函数体将在另一个线程里执行
+
+* 接下来你可以在main里面做一些特别的事情,`download`会持续在后台悄悄运行
+
+* 最后调用`future`的get方法,如果此时`download`还没有完成,会等待`download`完成,并获取`download`的返回值
+
+  ```C++
+  #inlcude<iostream>
+  #include<string>
+  #include<thread>
+  #include<future>
+  
+  int download(std::string file){
+      for(inti = 0; i < 10; i ++){
+          std::cout << "Downloading" << file
+              << "( " <<i * 10 << "%)..." << std::endl;\
+          std::this_thread::sleep_for(std::chrono::milliseconds(400));
+      }
+      std::cout << "Download complete: " << file << std::endl;
+      return 404;
+  }
+  
+  void interact(){
+      std::string name;
+      std::cin >> name;
+      std::cout << "HI, " << name << std::endl;
+  }
+  
+  int main(){
+      std::future<int> fret = std::async([&]{
+          return download("hello.zip");
+      });
+      interact();
+      int ret = fret.get();
+      std::cout << "Download result: " << ret << std::endl;
+      return 0;
+  }
+  
+  ```
+
+  
+
+## 23.1等待一段时间: wait_for()
+
+* 只要线程没有执行完,`wait()`会无限等下去
+* 而`wait_for()`则可以指定一个最长等待时间, 用`chrono`里的类表示单位.他会返回一个`std::future_status`表示等待是否成功
+* 如果超过这个时间线程还没有执行完毕,则放弃等待,返回`future_status::timeout`
+* 如果线程在指定的时间内执行完毕,则认为等待完成,返回`future_status::ready`
+* 同理还有`wait_until`其参数是一个时间点.
+
+```C++
+int main(){
+    std::future<int> fret = std::async([&]{
+        return download("hello.zip");
+    });
+    while(true){
+        std::cout << "Waiting for download complete..." << std::endl;
+        auto stat  = fret.wait_for(std::chrono::milliseconds(1000));
+        if(stat == std::future_status::ready){
+            std::cout << "future is ready!!! " << sdt::endl;
+            break;
+        }else{
+            std::cout << "Future not ready!!" << std::endl;
+        }
+    }
+    int ret = fret.get();   //获取下载的结果
+    std::cout << "Download result: " << ret << std::endl;
+    return 0;
+}
+```
+
+# 24. 避免互斥
+
+# 24.1 `std::mutex`上锁
+
+* 调用`std::mutex`的`lock()`时,会检测`mutex`是否已经**上锁**
+* 如果没有**锁定**,则对**mutex**进行上锁.
+* 如果已经**锁定**,则陷入等待,知道`mutex`被另一个**线程**解锁后,才再次**上锁**
+* 而调用`unlock()`则会进行**解锁**
+* 这样,就可以保证`mtx.lock()`和`mtx.unlock()`之间的代码段,同一时间只有一个线程在执行,从而避免数据竞争
+
+```C++
+#include<iostream>
+#include<string>
+#include<thread>
+#include<vector>
+#include<mutex>
+
+int main(){
+    std::vector<int> arr;
+    std::mutex mtx;
+    
+    std::thread t1([&]{
+        for(int i = 0;  i< 1000; i ++){
+            mtx.lock();
+            arr.push_back(1);
+            mtx.unlock();
+        }
+    });
+ 	std::thread t2([&]{
+        for(int i = 0; i < 1000; i++){
+            mtx.lock();
+            arr.push_back(2);
+            mtx.unlock();
+        }            
+    });
+    t1.join();
+    t2.join();
+    return 0;
+}
+```
+
+
+
+
+
+## 24.2 `std::lock_guard`: 符合RAII思想的上锁和解锁
+
