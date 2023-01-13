@@ -1638,4 +1638,279 @@ int main(){
     }
     ```
 
-  * 
+  * 多个对象就每个对象一把锁
+
+
+
+
+
+##  24.4 如果上锁失败, 不要等待: try_lock()
+
+* `lock()`如果发现`mutex`已经上锁的话, 会等待他直到他解锁
+* 也可以用无阻塞的`try_lock()`,他在上锁失败后不会陷入等待,而是直接返回`false`;如果上锁成功,则会返回`true`
+
+```C++
+#include<iostream>
+#include<mutex>
+
+std::mutex mtx1;
+
+int main(){
+    if(mtx1.try_lock()){
+        printf("succeed! \n");
+    }else{
+        printf("failed\n");
+    }
+    
+    if(mtx1.try_lock()){
+        printf("succeed\n");
+    }else{
+        printf("failed\n");
+    }
+    
+    mtx1.unlock();
+    return 0;
+}
+```
+
+
+
+
+
+* 只等待一段时间: `try_lock_for()`,参数可以设定时间
+* 同理还有接受时间点的`try_lock_until()`
+
+## 24.5同时锁住多个`mutex`:死锁难题
+
+由于同时执行的两个线程,他们发生的指令不一定是同步的,因此有可能出现这种情况:
+
+* t1执行`mtx1.lock()`
+
+* t2执行`mtx2.lock()`
+
+* t1执行`mtx2.lock()`:失败,陷入等待
+
+* t2执行`mtx1.lock()`: 失败,陷入等待
+
+* 双方都在等着对方释放锁,但是因为等待而无法释放锁,从而要无线等待下去
+
+* 这种现象称为死锁(dead-lock)
+
+* ```C++
+  #include<iostream>
+  #include<string>
+  #include<thread>
+  #inlclude<mutex>
+  
+  int main(){
+      std::mutex mtx1;
+      std::mutex mtx2;
+      
+      std::thread t1([&]{
+          for(int i = 0;i < 1000; i++){
+              mtx1.lock();
+              mtx2.lock();
+              mtx2.unlock();
+              mtx1.unlock();
+          }
+      });
+      
+      std::thread t2([&]{
+          for(int i =0; i < 1000; i++){
+              mtx2.lock();
+              mtx1.lock();
+              mtx1.unlock();
+              mtx2.unlock();
+          }
+      });
+      
+      t1.join();
+      t1.join();
+         
+      
+      return 0;
+  }
+  ```
+
+* 永远不要同时持有两个锁,分别上锁,这样也可以避免死锁
+
+* 用`std::lock()`同时对多个上锁`std::lock(mtx1,mtx2)`
+
+* RAII版本的`std::scoped_lock()`
+
+
+
+* 同一个线程重复调用`lock()`也会造成死锁
+
+## 24.6 `std::shared_lock()`:符合RAII思想的`lock_shared()`
+
+* 正如`std::unique_lock()`,也可以用`std::shared_lock()`针对`lock_shared()`,这样就可以在函数体退出时自动调用`unlock_shared()`,更加安全了
+
+* ```C++
+  #include<iostream>
+  #include<thread>
+  #include<vector>
+  #include<mutex>
+  #include<shared_mutex>
+  
+  class MTVcector{
+      std::vector<int> m_arr;
+      mutable std::shared_mutex m_mtx;
+  public:
+      void push_back(int val){
+          std::unique_lock grd(m_mtx);
+          m_arr.push_back(val);
+       }
+      
+      size_t size() const{
+          std::shared_lock grd(m_mtx);
+          return m_arr.size();
+      }
+  };
+  
+  int main(){
+      MTVector arr;
+      
+      std::thread t1([&] (){
+          for(int i = 0; i < 1000; i ++){
+              arr.push_back(i);
+          }
+      });
+      
+      std::thread t2([&] (){
+          for(int i = 0; i < 1000;  i++){
+              arr.push_back( 1000 + i);
+          }
+      });
+      
+      t1.join();
+      t2.join();
+      
+      std::cout << arr.size() << std::endl;
+      
+      return 0;
+      
+  }
+  
+  ```
+
+
+
+
+
+# 25.条件变量
+
+## 25.1 条件变量: 等待被唤醒
+
+* `cv.wait(lck)`将会让当前线程陷入等待
+
+* 在其他线程中调用`cv.notify_one()`则会唤醒那个陷入等待的线程
+
+* 可以发现`std::condition_varibale`必须和`std::unique_lock<std::mutex>`一起用
+
+* ```C++
+  #include<iostream>
+  #include<thread>
+  #include<mutex>
+  #include<condition_variable>
+  
+  int main(){	
+      std::condition_variable cv;
+      std::mutex mtx;
+      
+      std::thread t1([&]{
+          std::unique_lock lck(mtx);
+          cv.wait(lck);              //这里在等待
+          
+          std::cout << "t1 is awake" << std::endl;
+      });
+      
+      std::this_thread::sleep_for(std::chrono::milliseconds(400))
+      
+      std::cout << "notifying...." << std::endl;
+      cv.notify_one();           //will awake t1
+      
+      t1.join();
+      return 0;
+  }
+  ```
+
+  
+
+  
+
+## 25.2原子级别的操作
+
+* `fetch_add`对应于 +=
+
+* `store`对应于 =
+
+* `load`用于读取其中的`int`值
+
+  ```C++
+  #include<iostream>
+  #inlcude<thread>
+  #include<atomic>
+  int main(){
+      std::atomic<int> counter;
+      counter.store(0);
+      
+      
+      std::vector<int> data(20000);
+      
+      std::thread t1([&]{
+         for(int i = 0;i < 10000; i++){
+             int index = counter.fetch_add(1);
+             data[index] = i;
+         } 
+      });
+      
+      std::thread t2([&]{
+          for(int i = 0; i < 10000; i ++){
+              int index = counter.fetch_add(1);
+              data[index] =  i + 10000;
+          }
+      });
+      
+      t1.join();
+      t2.join();
+      
+      std::cout << data[10000] << std::endl;
+        
+      return 0;
+  }
+  
+  #include<iostream>
+  #inlcude<thread>
+  #include<atomic>
+  int main(){
+      std::atomic<int> counter;
+      counter.store(0);
+      
+      
+      std::thread t1([&]{
+         for(int i = 0;i < 10000; i++){
+  			counter.fetch_add(1);
+         } 
+      });
+      
+      std::thread t2([&]{
+          for(int i = 0; i < 10000; i ++){
+  			counter.fetch_add(1);
+          }
+      });
+      
+      t1.join();
+      t2.join();
+      
+      std::cout << counter.load() << std::endl;
+        
+      return 0;
+  }
+  
+  // 20000
+  //原子级别的操作能在多线程中准确得到结果
+  
+  ```
+
+  
