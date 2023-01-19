@@ -812,6 +812,12 @@ const int* const a = & [4]    //常量数据的常量指针
 
 
 
+* C++函数前和函数后加const修饰符区别
+
+函数名后面加了const修饰符，这样说明函数的成员对象是不允许修改的，在类的成员函数里面，默认是在成员函数的第一个位置是this指针，如果在成员函数（只能是成员函数，要是类的静态函数或者是非成员函数就不可以在函数后面加上const）后面加const，则说明this指针的值是不可以修改的，只能读取。而如果函数里面试图改变成员变量的值，这样编辑器肯定是不允许的，所以会出现错误的。
+
+解决办法：在类的成员变量前面加上mutable修饰符。
+
 # 13.常用容器:tuple
 
 * `std::tuple<...>`可以将多个不同类型的值**打包**成一个.尖括号里填各个元素的类型.
@@ -1910,6 +1916,55 @@ int main(){
   
   // 20000
   //原子级别的操作能在多线程中准确得到结果
+  
+  ```
+
+  
+
+* `fetch_add`会返回旧值
+
+* `exchange`:读取的同时写入
+
+* `compare_exchange_strong`:读取,比较是否相等, 相等则写入
+
+  
+
+# 26. `forword`与完美转发
+
+*  所谓完美转发是指在函数模板中,完全依照模板的参数的类型(即保持参数的左值,右值),将参数传递给函数模板中调用的另一个函数.  
+* C++11中提供了这样一个函数`std::forward`, 不管参数是T&&这种未定的引用还是明确的左值引用或者右值引用,它会按照参数本来的类型转发.
+
+* 右值引用, 完美转发再结合可变模板参数, 我们可以写一个万能的函数包装器, 带返回值的, 不带返回值的, 带参数的, 和不带参数的函数都可以委托这个万能的函数包装器执行.
+
+* ```C++
+  // 万能的函数包装器
+  template <class Function, class ...Args>
+  inline auto FuncWarpper(Function && f, Args && ... args) -> decltype(f(std::forward<Args>(args)...))
+  {
+      return f(std::foward<Args>(args)...);
+  }    
+  
+  
+  
+  //测试代码如下
+  void test(){
+      cout << "void" << endl;
+  }
+  int test1(){
+      return 1;
+  }
+  int test2(int x){
+      return x;
+  }
+  string test3(string s1, string s2){
+      return s1 + s2;
+  }
+  test(){
+      FunWrapper(test0);          //没有返回值
+      FunWrapper(test1);          //返回1
+      FunWrapper(test2,1);		//返回1
+      FunWrapper(test3,"aa","bb");//返回"aabb"
+  }
   
   ```
 
