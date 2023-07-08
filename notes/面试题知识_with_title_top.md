@@ -1,31 +1,31 @@
 <a name="index">**Index**</a>
-<a href="#0">1. 1.进程有多少种状态？</a>  
-<a href="#1">2. 2.线程之间的通信方式</a>  
-<a href="#2">3. 3.进程通信的方式</a>  
-<a href="#3">4. 4.进程和线程的区别?</a>  
-<a href="#4">5. 5.线程和协成的区别？</a>  
-<a href="#5">6. 6.死锁是怎么产生的？</a>  
-<a href="#6">7. 7.虚拟内存与物理内存</a>  
-<a href="#7">8. 8.条件变量</a>  
-<a href="#8">9. 9.TCP与UDP</a>  
-<a href="#9">10. 10.OSI七层模型</a>  
-<a href="#10">10. 11.TCP如何实现可靠传输</a>  
-<a href="#11">10. 12.滑动窗口</a>  
-<a href="#12">10. 13. static关键字的作用</a>  
-<a href="#13">10. 14.野指针怎么产生和避免</a>  
-<a href="#14">10. 15. C语言与C++的区别?</a>  
-<a href="#15">10. 16. const和define的区别</a>  
-<a href="#16">10. 17.extern相关</a>  
-<a href="#17">10. 18.const的用法</a>  
-<a href="#18"> 19. C 语言里面 volatile，可以和 const 同时使用</a>  
-<a href="#19">10. 20.引用的概念</a>  
-<a href="#20">10. 21.指针和引用的区别</a>  
-<a href="#21">10. 22.内联函数和函数的区别，内联函数的作用</a>  
-<a href="#22">10. 23.C++的内存管理</a>  
-<a href="#23">10. 24.栈和堆的区别</a>  
-<a href="#24">10. 25.什么是内存泄露，如何检测</a>  
-<a href="#25">10. 26.内存对齐  </a>  
-# <a name="0">1. 1.进程有多少种状态？</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+<a href="#0">1. 进程有多少种状态？</a>  
+<a href="#1">2. 线程之间的通信方式</a>  
+<a href="#2">3. 进程通信的方式</a>  
+<a href="#3">4. 进程和线程的区别?</a>  
+<a href="#4">5. 线程和协成的区别？</a>  
+<a href="#5">6. 死锁是怎么产生的？</a>  
+<a href="#6">7. 虚拟内存与物理内存</a>  
+<a href="#7">8. 条件变量</a>  
+<a href="#8">9. TCP与UDP</a>  
+<a href="#9">10. OSI七层模型</a>  
+<a href="#10">11. TCP如何实现可靠传输</a>  
+<a href="#11">12. 滑动窗口</a>  
+<a href="#12">13. static关键字的作用</a>  
+<a href="#13">14. 野指针怎么产生和避免</a>  
+<a href="#14">15. C语言与C++的区别?</a>  
+<a href="#15">16. const和define的区别</a>  
+<a href="#16">17. extern相关</a>  
+<a href="#17">18. const的用法</a>  
+<a href="#18"> 19. C 语言里面 volatile可以和 const 同时使用</a>  
+<a href="#19">20. 引用的概念</a>  
+<a href="#20">21. 指针和引用的区别</a>  
+<a href="#21">22. 内联函数和函数的区别，内联函数的作用</a>  
+<a href="#22">23. C++的内存管理</a>  
+<a href="#23">24. 栈和堆的区别</a>  
+<a href="#24">25. 什么是内存泄露，如何检测</a>  
+<a href="#25">26. 内存对齐  </a>  
+# <a name="0">1. 进程有多少种状态？</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 创建,就绪,执行,阻塞,终止
  *  创建: 一个进程启动就进入创建状态,需要获取系统资源创建进程管理块(PCB)完成资源创建
@@ -34,7 +34,7 @@
  *  阻塞: 在运行状态期间,如果进行阻塞操作,此时进程暂时无法操作进入阻塞态,完成后进入就绪状态,等待再次获取处理器资源终
  *  止状态: 进程结束或是被操作系统终止.
 
-# <a name="1">2. 2.线程之间的通信方式</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="1">2. 线程之间的通信方式</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 信号,互斥锁,读写锁,自旋锁,条件变量,信号量
 
@@ -48,7 +48,7 @@
 3. 条件变量: 条件变量可以以原子的方式阻塞进程，直到某个特定条件为真为止。对条件的测试是在互斥锁的保护下进行的，条件变量始终与互斥锁一起使用。
 4. 信号量: 信号量实际上是一个非负的整数计数器，用来实现对公共资源的控制。在公共资源增加的时候，信号量就增加；公共资源减少的时候，信号量就减少；只有当信号量的值大于0的时候，才能访问信号量所代表的公共资源。
 
-# <a name="2">3. 3.进程通信的方式</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="2">3. 进程通信的方式</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 管道,命名管道,信号,消息队列,共享内存,内存映射,信号量,Socket
  	1. 管道（匿名管道）：本质上是内核中维护的一块内存缓冲区，Linux系统中由pipe()函数创建，只能用于具有亲缘关系的进程间通信。
@@ -60,7 +60,7 @@
 	7. 信号量：主要用来解决进程和线程间并发执行时的同步问题，信号量操作分为P操作和V操作，P将信号量值-1，V将信号量值+1。当信号量值<=0时，进行P操作进线程会被阻塞，		直到另一个进程或线程执行了V操作将信号量的值大于0时。
 	8. Socket 套接字：一般用于网络中不同主机上的进程之间的通信，且提供了应用层进程利用网络协议交换数据的机制。
 
-# <a name="3">4. 4.进程和线程的区别?</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="3">4. 进程和线程的区别?</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 地址空间,开销,并发性,内存
 
@@ -72,14 +72,14 @@
 5. 进程有独立的内存空间，除CPU外，系统不会为线程分配内存
 6. 一个进程崩溃后， 在保护模式下不会对其他进程产生影响，但是一个线程崩溃了，整个进程都死掉。
 
-# <a name="4">5. 5.线程和协成的区别？</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="4">5. 线程和协成的区别？</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 1. 线程是操作系统的资源，线程的创建、切换、终止都会造成资源的浪费，而协程是靠编译语言来实现的，所以协程也被称作用户态线程
 2. 线程是并行的，协程是并发的。
 3. 线程同步，协程异步
 4. 线程抢占式，协程非抢占式，需要手动切换 
 
-# <a name="5">6. 6.死锁是怎么产生的？</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="5">6. 死锁是怎么产生的？</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 1. 死锁：两个或两个以上得进程在争夺共享资源时产生的一种互相等待的现象。
 
@@ -93,20 +93,20 @@
 
 3. 死锁的解决方法：有序资源分配法，银行家算法 
 
-# <a name="6">7. 7.虚拟内存与物理内存</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="6">7. 虚拟内存与物理内存</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 1. 直接使用物理内存的缺陷：隔离性差，物理内存不够用； 
 
 2. 虚拟内存；每个进程都可以自己搞一份，在需要的时候映射到物理内存，变相扩大了物理内存；同时隔离性也比较好；
 
-# <a name="7">8. 8.条件变量</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="7">8. 条件变量</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 条件变量是利用线程间共享的全局变量进行同步的一种机制，主要包括两个动作：
 
 * 个线程等待"条件变量的条件成立"而挂起；
 * 另一个线程使"条件成立"（给出条件成立信号）。
 
-# <a name="8">9. 9.TCP与UDP</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="8">9. TCP与UDP</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 1. TCP是面向对象连接；而UDP是无面向对象连接 
 
@@ -118,9 +118,7 @@
 5. TCP只支持点对点的数据传输；而UDP支持一对一、一对多、多对多等各种场景
 6. TCP有拥塞控制和流量控制来确保数据的安全性，但如果网络拥塞的话，速度会比较慢；UDP即使在网络拥塞的时候，传输速度也不会慢
 
-
-
-# <a name="9">10. 10.OSI七层模型</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="9">10. OSI七层模型</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 应用层、表示层、会话层、传输层、网络层、数据链路层、物理层
 
@@ -138,13 +136,13 @@
 
 * 物理层，负责最底层的数据传输。  
 
-# <a name="10">10. 11.TCP如何实现可靠传输</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="10">11. TCP如何实现可靠传输</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 1. 首先可靠传输是指没差错、不丢失、不重复、按序到达。
 
 2. 相应的TCP头部有检验和来保证不出差错，然后会采用重传和确认机制来保障不重复，不丢失，按序，还会有流量控制和拥塞控制来减少丢包率。
 
-# <a name="11">10. 12.滑动窗口</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="11">12. 滑动窗口</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 滑动窗口机制主要是通过窗口大小实现流量控制，进而解决发送方发送数据过快、过多导致的接收端缓存区数据溢出导致的丢包现象；回退n步协议、停等式协议、选择重传协议
 
@@ -152,7 +150,7 @@
 
 
 
-# <a name="12">10. 13. static关键字的作用</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="12">13. static关键字的作用</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 关键字、作用域、生命周期、共享数据 
 
@@ -163,7 +161,7 @@
 
 
 
-# <a name="13">10. 14.野指针怎么产生和避免</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="13">14. 野指针怎么产生和避免</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 概念: 野指针是指指向的位置是随机的、不可知的、不正确的。(一般是没有初始化)
 
@@ -180,7 +178,7 @@
 
 
 
-# <a name="14">10. 15. C语言与C++的区别?</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="14">15. C语言与C++的区别?</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 面向对象,面向过程, 重载, void, struct, 函数参数默认值, 内联函数, 引用, 动态内存分配, 作用域
 
@@ -195,7 +193,7 @@
 
 
 
-# <a name="15">10. 16. const和define的区别</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="15">16. const和define的区别</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 作用、编译阶段、预处理阶段、简单替换、类型检查、内存,
 
@@ -210,7 +208,7 @@ const 在 C 语言中表示只读，编译器禁止对它修饰的变量进行�
 
 
 
-# <a name="16">10. 17.extern相关</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="16">17. extern相关</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 extern的作用: 声明外部变量和函数、静态存储区（全局区）
 
@@ -218,7 +216,7 @@ extern的作用: 声明外部变量和函数、静态存储区（全局区）
 2. extern 变量表示声明一个变量，表示该变量是一个外部变量，也就是全局变量，所以 extern 修饰的变量保存在静态存储区（全局区），全局变量如果没有显示初始化，会默认初始化为 0
 3. . extern "C" 的作用是为了能够正确的实现 C++ 代码调用 C 语言代码。加上 extern "C" 后，会指示编译器这部分代码按照 C 语言（而不是 C++）的方式进行编译。
 
-# <a name="17">10. 18.const的用法</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="17">18. const的用法</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
  变量、指针、函数参数、成员、成员方法
 
@@ -232,7 +230,7 @@ extern的作用: 声明外部变量和函数、静态存储区（全局区）
 
    * 指针常量 const int * const p; 
 
-   *  const int * p 是常量指针，表示指针变量 p 所指向的内容不能修改，指针变量 p 的内容可以修改； 
+   * const int * p 是常量指针，表示指针变量 p 所指向的内容不能修改，指针变量 p 的内容可以修改； 
 
    * int * const p 是指针常量，表示指针变量 p 的内容不能修改，指针变量 p 所指向的内容可以修改； 
 
@@ -241,13 +239,16 @@ extern的作用: 声明外部变量和函数、静态存储区（全局区）
      
 
 3. const 用于函数参数 void foo(const int * p); void foo(const int & p);    const 用于形参时说明形参在函数内部不能被改变，这是非常有用的，有时候函数参数传递指针或者引用，在函数内部不希望对指针和引用指向的数据进行修改，可以加上 const。
+
 4. 在类中修饰成员方法，防止在方法中修改非 static 成员
+
 5. const修饰的全局变量会变为仅仅该文件可见。如果想在其他文件直接使用需要在其他文件进行extern声明一下。
+
 6. const 修饰类的成员变量，如果 const 修饰的是非静态的成员变量，可以在构造函数中对该变量进行初始化；如果 const 修饰的是静态的成员变量，则需要在类外对该变量进行初始化。   
 
 
 
-# <a name="18"> 19. C 语言里面 volatile，可以和 const 同时使用</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="18"> 19. C 语言里面 volatile可以和 const 同时使用</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 volatile 的含义是防止编译器对该代码进行优化，这个值可能变掉的。
 
@@ -255,7 +256,7 @@ volatile 的含义是防止编译器对该代码进行优化，这个值可能�
 
 
 
-# <a name="19">10. 20.引用的概念</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="19">20. 引用的概念</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 概念: 引用可以看做是数据的一个别名
 
@@ -271,7 +272,7 @@ volatile 的含义是防止编译器对该代码进行优化，这个值可能�
 
 
 
-# <a name="20">10. 21.指针和引用的区别</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="20">21. 指针和引用的区别</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 
 
@@ -289,7 +290,7 @@ volatile 的含义是防止编译器对该代码进行优化，这个值可能�
 
 
 
-# <a name="21">10. 22.内联函数和函数的区别，内联函数的作用</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="21">22. 内联函数和函数的区别，内联函数的作用</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 函数调用开销、寻址、展开代码、提高效率、宏定义 , inline
 
@@ -303,7 +304,7 @@ volatile 的含义是防止编译器对该代码进行优化，这个值可能�
    1. 编译器预处理,在调用内联函数的地方将内联函数的语句复制到调用函数的地方,直接展开代码执行,提高效率.,
    2. 同时解决宏定义的问题.
 
-# <a name="22">10. 23.C++的内存管理</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="22">23. C++的内存管理</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 C++ 的内存分区主要有：
 
@@ -329,7 +330,7 @@ C++ 的内存分区主要有：
 
 ​	代码区
 
-# <a name="23">10. 24.栈和堆的区别</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="23">24. 栈和堆的区别</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 管理方式、空间大小、是否产生内存碎片、生长方向、分配方式、分配效率 
 
@@ -345,7 +346,7 @@ C++ 的内存分区主要有：
 7. 分配效率 栈是机器系统提供的数据结构，计算机会在底层对栈提供支持，分配专门的寄存器存放栈的地址，压栈出栈都有专门的指令执行，这就决定了栈的效率很高。
 8. 堆的效率要比栈底的多。
 
-# <a name="24">10. 25.什么是内存泄露，如何检测</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="24">25. 什么是内存泄露，如何检测</a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 概念、避免内存泄露、检测
 
@@ -354,7 +355,7 @@ C++ 的内存分区主要有：
 2. 避免内存泄露的方法主要就是要有良好的编码习惯，动态开辟内存空间，及时释放内存。也可以采用智能指针来避免内存泄露。
 3. 可以采用静态分析技术、源代码插装技术等进行检测。
 
-# <a name="25">10. 26.内存对齐  </a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
+# <a name="25">26. 内存对齐  </a><a style="float:right;text-decoration:none;" href="#index">[Top]</a>
 
 什么是内存对齐、内存对齐的原因、内存对齐的规则  
 
