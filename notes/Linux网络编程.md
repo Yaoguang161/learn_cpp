@@ -155,6 +155,8 @@ bind(fd,(struct sockaddr *)&addr, size)
 
 
 
+首先将整个结构体清零, 然后设置地址类型为`AF_INET` 网络地址为`INADDR_ANY`, 这个宏表示本地的任意IP地址,因为服务器可能有多个网卡, 每个网卡都可能绑定多个`IP`地址, 这样设置可以在所有的IP地址上监听, 知道与某个客户端建立了连接时才确定下来到底用哪个`IP`地址.
+
 # 12. Socket模型创建流程图
 
 ![image-20230831233245799](C:\Users\Asaki\AppData\Roaming\Typora\typora-user-images\image-20230831233245799.png)
@@ -171,7 +173,120 @@ bind(fd,(struct sockaddr *)&addr, size)
 
 
 
+# 13. Socket函数
 
+```c++
+Socket函数:
+
+#include <sys/socket.h>
+int socket(int domain, int type, int protocol);  //创建一个套接字
+
+	domain: AF_INET, AF_INET6, AF_UNIX
+    type:   SOCK_STREAM, SOCK_DGRAM   //流式和报式协议, 流式是TCP,报式是UDP
+    protocol: 0;
+
+	返回值: 
+		   成功: 新套接字对应的文件描述符
+           失败: -1  errno
+               
+```
+
+
+
+# 14. bind函数
+
+```c++
+#include <arpa/inet.h>
+int bind(int sockfd, const struct sockaddr * addr, socklen_t addrlen); //给socket绑定一个地址结构(IP + port)
+    sockfd: socket 函数返回值
+    struct sockaddr_in addr;
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(8888);
+    addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    addr: 传入参数(struct sockaddr *)&addr
+    addrlen: sizeof(addr) 地址结构的大小
+             
+	返回值:
+		成功: 0
+    	失败: -1 errno错误号
+                
+```
+
+
+
+# 15. listen函数
+
+```c++
+int listen(int sockfd, int backlog);  //设置同时与服务器建立连接的上限数.(同时进行三次握手的客户端数量)
+
+	sockfd: socket 函数返回值
+    backlog: 上限数值. 最大值 128
+    
+	返回值:
+			成功: 0
+            失败: -1 errno                
+```
+
+
+
+# 16. accept函数
+
+```c++
+int accept(int sockfd,  struct sockaddr * addr, socklen_t *addrlen); //阻塞等待客户端建立连接,成功的话, 返回一个与客户端成功连接的socket文件描述符
+
+	sockfd: socket 函数返回值
+    addr: 传出参数. 成功与服务器建立连接的那个客户端的地址结构(IP + port)
+        
+           socklen_t clit_addr_len = sizeof(addr);
+    addrlen: 传入传出.  &clit_addr_len
+             入: addr的大小 . 出: 客户端addr实际大小.
+    返回值:
+			成功: 能与服务器进行数据通信的socket 对应的文件描述符.
+            失败: -1 ,errno
+```
+
+# 17. connect() 函数
+
+```c++
+int connect(int socket, const struct sockadr *addr, socklen_t addrlen); //使用现有的socket与服务器建立连接
+	sockfd: socket 函数返回值
+        	struct sockaddr_in srv_addr;   //服务其地址结构
+			srv_addr.sin_family = AF_INET;
+			srv_addr.sin_port = 9527;
+			srv_addr.sin_addr.s_addr      //跟服务器bind时设定的port完全一致
+            inet_pton(AF_INET, "服务器的IP地址", &srv_addr.sin_addr.s_addr);
+    addr: 传入参数. 服务器的地址结构
+        	inet_pton();
+    addrlen: 服务器的地址结构的大小.
+    返回值:
+		成功: 0
+        失败: -1 errno
+    如果不使用bind绑定客户端地址结构, 采用 "隐式绑定",由系统实现                
+```
+
+
+
+# 18.TCP通信流程分析
+
+Server:
+
+	1. `socket()` 创建 `socket`
+	1. `bind()`  绑定服务器地址结构
+	1. `listen()` 设置监听上限
+	1. `accept()` 阻塞监听客户端连接
+	1. `read(fd)`: 读`socket`获取客户端数据
+	1. 小 -- 大写   `toupper()`
+	1. `write(fd)`
+	1. `close()`
+
+Client:
+
+	1. `socket()` 创建socket
+	1. `connect()`    与服务器建立连接
+	1. `write()` 写数据到socket
+	1. `read()` 读转换后的数据
+	1. 显式读取结果
+	1. `close()`
 
 
 
