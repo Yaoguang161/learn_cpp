@@ -1,0 +1,16 @@
+# linux files
+.cache/
+build/
+# wendous files
+.vs/
+out/
+CMakeSettings.json
+.vscode/
+# clion files
+cmake-build-debug/
+cmake-build-release/
+.idea/
+.clang-format
+# teacher files
+prebuild/
+.~*
