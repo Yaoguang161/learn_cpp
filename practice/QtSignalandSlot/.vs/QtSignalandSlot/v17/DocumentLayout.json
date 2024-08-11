@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "D:\\Code\\QtSignalandSlot\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{10CB8715-7D34-482B-92EE-233B6F64A82A}|QtSignalandSlot.vcxproj|D:\\Code\\QtSignalandSlot\\Signal.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{10CB8715-7D34-482B-92EE-233B6F64A82A}|QtSignalandSlot.vcxproj|solutionrelative:Signal.hpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{10CB8715-7D34-482B-92EE-233B6F64A82A}|QtSignalandSlot.vcxproj|D:\\Code\\QtSignalandSlot\\main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{10CB8715-7D34-482B-92EE-233B6F64A82A}|QtSignalandSlot.vcxproj|solutionrelative:main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
@@ -23,12 +27,25 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
+              "Title": "Signal.hpp",
+              "DocumentMoniker": "D:\\Code\\QtSignalandSlot\\Signal.hpp",
+              "RelativeDocumentMoniker": "Signal.hpp",
+              "ToolTip": "D:\\Code\\QtSignalandSlot\\Signal.hpp",
+              "RelativeToolTip": "Signal.hpp",
+              "ViewState": "AQIAAGoAAAAAAAAAAAAQwHgAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2024-08-05T15:28:56.327Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
               "Title": "main.cpp",
               "DocumentMoniker": "D:\\Code\\QtSignalandSlot\\main.cpp",
               "RelativeDocumentMoniker": "main.cpp",
               "ToolTip": "D:\\Code\\QtSignalandSlot\\main.cpp",
               "RelativeToolTip": "main.cpp",
-              "ViewState": "AQIAAFsAAAAAAAAAAAAAwGMAAAAMAAAA",
+              "ViewState": "AQIAAEIAAAAAAAAAAAAQwEoAAAAXAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2024-07-21T13:41:59.69Z",
               "EditorCaption": ""
